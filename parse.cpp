@@ -74,18 +74,14 @@ ParseTree *Stmt(istream *in, int *line) {
 	case IF:
 		s = IfStmt(in, line);
 		break;
-
 	case PRINT:
 		s = PrintStmt(in, line);
 		break;
-
 	case DONE:
 		return 0;
-
 	case ERR:
 		ParseError(*line, "Invalid token");
 		return 0;
-
 	default:
 		// put back the token and then see if it's an Expr
 		Parser::PushBackToken(t);
@@ -118,7 +114,6 @@ ParseTree *Expr(istream *in, int *line) {
 	if( t1 == 0 ) {
 		return 0;
 	}
-
 	Token t = Parser::GetNextToken(in, line);
 
 	if( t != ASSIGN ) {
