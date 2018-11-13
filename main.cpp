@@ -4,7 +4,7 @@
 #include "tokens.h"
 #include "parse.h"
 #include "lex.h"
-
+#include "parse.cpp"
 
 using namespace std;
 int main(int argc, char* argv[])
