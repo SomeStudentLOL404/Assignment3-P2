@@ -5,8 +5,8 @@
 #include "parse.h"
 #include "lex.h"
 #include "parse.cpp"
-
 using namespace std;
+
 int main(int argc, char* argv[])
 {
     ifstream infile1;
@@ -36,6 +36,5 @@ int main(int argc, char* argv[])
     {
         return 0; // quit on error
     }
-
     return 0;
 }

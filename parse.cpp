@@ -52,14 +52,17 @@ ParseTree *Prog(istream *in, int *line)
 // Slist is a Statement followed by a Statement List
 ParseTree *Slist(istream *in, int *line) {
 	ParseTree *s = Stmt(in, line);
+    
+    //INSPIRATION
 	if( s == 0 )
 		return 0;
 
+    //SC part - Semicolon
 	if( Parser::GetNextToken(in, line) != SC ) {
 		ParseError(*line, "Missing semicolon");
 		return 0;
 	}
-
+    //Statement List
     return new StmtList(s, Slist(in,line));
 }
 
@@ -93,8 +96,6 @@ ParseTree *Stmt(istream *in, int *line) {
 		}
 		break;
 	}
-
-
 	return s;
 }
 
