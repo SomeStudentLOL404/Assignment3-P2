@@ -38,6 +38,11 @@ ParseError(int line, string msg)
 
 ParseTree *Prog(istream *in, int *line)
 {
+    /*
+     * Prog Grammar Rule:
+     * Prog := Slist
+     */
+    //Given so dont change it
 	ParseTree *sl = Slist(in, line);
 
 	if( sl == 0 )
@@ -50,10 +55,15 @@ ParseTree *Prog(istream *in, int *line)
 }
 
 // Slist is a Statement followed by a Statement List
-ParseTree *Slist(istream *in, int *line) {
+ParseTree *Slist(istream *in, int *line)
+{
+    /*
+     * Slist Grammar Rule:
+     * Slist := Stmt SC { Slist }
+     */
+    //Given so dont change it
 	ParseTree *s = Stmt(in, line);
-    
-    //INSPIRATION
+
 	if( s == 0 )
 		return 0;
 
@@ -67,6 +77,11 @@ ParseTree *Slist(istream *in, int *line) {
 }
 
 ParseTree *Stmt(istream *in, int *line) {
+    /*
+     * Stmt Grammar Rule:
+     * Stmt := IfStmt | PrintStmt | Expr
+     */
+    //Given so dont change it
 	ParseTree *s;
 
 	Token t = Parser::GetNextToken(in, line);
@@ -95,23 +110,54 @@ ParseTree *Stmt(istream *in, int *line) {
 	return s;
 }
 
-ParseTree *IfStmt(istream *in, int *line) {
-    // ADD HANDLER
+ParseTree *IfStmt(istream *in, int *line)
+{
+    /*
+     * IfStmt Grammar Rule:
+     * IfStmt := IF Expr THEN Stmt
+     */
+    //ParseTree for Expression
+    ParseTree *ex = Expr(*in, *line);
+    //Create a new token 't'
+    Token t = Parser::GetNextToken(in, line);
+
+    /*
+     * We only need to check for a "THEN" statement
+     * If theres a THEN, return it
+     */
+    if(t.GetTokenType() == THEN)
+    {
+        ParseTree *s = Stmt(*in, *line);
+        return new IfStatement(t.GetLinenum(), ex, stmt);
+    }
     return 0;
-	
-    //return new IfStatement(t.GetLinenum(), ex, stmt);
 }
 
-ParseTree *PrintStmt(istream *in, int *line) {
-    // ADD HANDLER
-    return 0;
-	
-	//return new PrintStatement(l, ex);
+ParseTree *PrintStmt(istream *in, int *line)
+{
+    /*
+     * PrintStmt Grammar Rule:
+     * PrintStmt := PRINT Expr
+     */
+    //Create new ParseTree for *PrintStmt
+    ParseTree *PrtStmt = Expr(*in, *line);
+
+    //Given by Professor, dont change this line below
+	return new PrintStatement(l, ex);
 }
 
-ParseTree *Expr(istream *in, int *line) {
+ParseTree *Expr(istream *in, int *line)
+{
+    /*
+     * Expr Grammar Rule:
+     * Expr := LogicExpr { ASSIGN LogicExpr }
+     */
+    /*
+     * (Maybe? For now) This Parts Done Already, no need to change
+     */
 	ParseTree *t1 = LogicExpr(in, line);
 	if( t1 == 0 ) {
+        ParseError(*line, "Error at Expression");
 		return 0;
 	}
 	Token t = Parser::GetNextToken(in, line);
@@ -130,27 +176,90 @@ ParseTree *Expr(istream *in, int *line) {
 	return new Assignment(t.GetLinenum(), t1, t2);
 }
 
-ParseTree *LogicExpr(istream *in, int *line) {
+ParseTree *LogicExpr(istream *in, int *line)
+{
+    /*
+     * LogicExpr Grammar Rule:
+     * LogicExpr := CompareExpr { (LOGICAND | LOGICOR) CompareExpr }
+     */
 	ParseTree *t1 = CompareExpr(in, line);
 	if( t1 == 0 ) {
+        ParseError(*line, "Error at Logic Expression - t1");
 		return 0;
 	}
 
-    // HANDLE OP
-    return 0;
+    Token t = Parser::GetNextToken(in, line);
+	if(t.GetTokenType() != LOGICAND && t.GetTokenType() != LOGICOR)
+    {
+        Parser::PushBackToken(t);
+        return t1;
+    }
+
+    ParseTree *t2 = CompareExpr(in, line);
+    if(t2 == 0)
+    {
+        ParseError(*line, "Error at Logic Expression - t2");
+        return 0;
+    }
+
+    //LogicAndExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+
+    if( t == LOGICAND )
+        t1 = new LogicAndExpr(t.GetLinenum(), t1, t2);
+    else if (t == LOGICOR)
+        t1 = new LogicOrExpr(t.GetLinenum(), t1, t2);
+
+    return t1;
 }
 
 ParseTree *CompareExpr(istream *in, int *line) {
 	ParseTree *t1 = AddExpr(in, line);
-	if( t1 == 0 ) {
+	if( t1 == 0 )
+	{
+        ParseError(*line, "Error at Compare Expression - 1");
 		return 0;
 	}
 
-    // HANDLE OP
+    Token t = Parser::GetNextToken(in, line);
+    if(t.GetTokenType() != EQ && t.GetTokenType() != NEQ && t.GetTokenType() != GT && t.GetTokenType() != LT && t.GetTokenType() != LEQ)
+    {
+        Parser::PushBackToken(t);
+        return t1;
+    }
+
+
+    //Do Checks
+    if( t == EQ )
+    {
+        //EqExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+        t1 = new EqExpr(t.GetLinenum(), t1, t2);
+    }
+    else if (t == NEQ)
+    {
+        //	NEqExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+        t1 = new NEqExpr(t.GetLinenum(), t1, t2);
+    }
+    else if (t == GT)
+    {
+        //GtExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+        t1 = new GtExpr(t.GetLinenum(), t1, t2);
+    }
+    else if (t == LT)
+    {
+        //LtExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+        t1 = new LtExpr(t.GetLinenum(), t1, t2);
+    }
+    else if (t == LEQ)
+    {
+        //LEqExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+        t1 == new LEqExpr(t.GetLinenum(), t1, t2);
+    }
+
     return 0;
 }
 
 ParseTree *AddExpr(istream *in, int *line) {
+    //Part Done Already - DO NOT TOUCH
 	ParseTree *t1 = MulExpr(in, line);
 	if( t1 == 0 ) {
 		return 0;
