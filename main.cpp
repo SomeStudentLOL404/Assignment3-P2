@@ -37,7 +37,17 @@ int main(int argc, char* argv[])
     {
         return 0; // quit on error
     }
-    //DO NOT IMPLEMENT COUNTER IN MAIN - keep it here as professor said
     cout << "LEAF COUNT: " << prog->LeafCount() << endl;
     cout << "STRING COUNT: " << prog->StringCount() << endl;
+
+    /*
+    if(prog->IdentCount() != 0)
+    {
+        cout << "IDENT COUNT: " << prog->IdentCount() << endl;\
+        int ourIdent = 0;
+        string currentIdent = "";
+        list<string>::iterator it;
+
+    }
+     */
 }

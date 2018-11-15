@@ -58,6 +58,7 @@ ParseTree *Prog(istream *in, int *line)
 // Slist is a Statement followed by a Statement List
 ParseTree *Slist(istream *in, int *line)
 {
+    // cout << "Do we Get to SList???" << endl;
     ParseTree *s = Stmt(in, line);
     if( s == 0 )
         return 0;
@@ -76,6 +77,9 @@ ParseTree *Stmt(istream *in, int *line) {
      * Stmt := IfStmt | PrintStmt | Expr
      */
     //Given so dont change it
+
+    //cout << "Do We Get To Stmt??" << endl;
+
     ParseTree *s;
 
     Token t = Parser::GetNextToken(in, line);
@@ -111,6 +115,8 @@ ParseTree *IfStmt(istream *in, int *line)
      * IfStmt Grammar Rule:
      * IfStmt := IF Expr THEN Stmt
      */
+    //cout << "Do We Get To IfStmt??" << endl;
+
     ParseTree *t5 = Expr(in, line);
     if (t5 == 0) {
         ParseError(*line, "Error at IfStmt - 1");
@@ -125,8 +131,6 @@ ParseTree *IfStmt(istream *in, int *line)
     ParseTree *stmt = Stmt(in, line);
 
     return new IfStatement(*line, t5, stmt);
-
-
 }
 
 ParseTree *PrintStmt(istream *in, int *line)
@@ -136,6 +140,8 @@ ParseTree *PrintStmt(istream *in, int *line)
      * PrintStmt := PRINT Expr
      */
     //Create new ParseTree for *PrintStmt
+    // cout << "Do We Get To PrintStmt??" << endl;
+
     ParseTree *t2 = Expr(in, line);
     if(t2 == 0) {
         ParseError(*line, "Error at PrintStmt - 1");
@@ -144,27 +150,14 @@ ParseTree *PrintStmt(istream *in, int *line)
     return new PrintStatement(t2->GetLinenum(), t2);
 }
 
-/*
-ParseTree *PrtStmt = Expr(*in, *line);
-if(!ex)
-{
-
-}
-
-//Given by Professor, dont change this line below
-return new PrintStatement(l, ex);
- */
-
-
 ParseTree *Expr(istream *in, int *line)
 {
     /*
      * Expr Grammar Rule:
      * Expr := LogicExpr { ASSIGN LogicExpr }
      */
-    /*
-     * (Maybe? For now) This Parts Done Already, no need to change
-     */
+    //cout << "Do we Get to Expr???" << endl;
+
     ParseTree *t1 = LogicExpr(in, line);
     if( t1 == 0 ) {
         ParseError(*line, "Error at Expression");
@@ -191,6 +184,9 @@ ParseTree *LogicExpr(istream *in, int *line)
      * LogicExpr Grammar Rule:
      * LogicExpr := CompareExpr { (LOGICAND | LOGICOR) CompareExpr }
      */
+    //cout << "Do we Get to LogicExpr??" << endl;
+
+
     ParseTree *t1 = CompareExpr(in, line);
     if( t1 == 0 ) {
         ParseError(*line, "Error at Logic Expression - t1");
@@ -222,6 +218,9 @@ ParseTree *LogicExpr(istream *in, int *line)
 }
 
 ParseTree *CompareExpr(istream *in, int *line) {
+
+    //cout << "Do We Get To CompareExpr??" << endl;
+
     ParseTree *t1 = AddExpr(in, line);
     if( t1 == 0 )
     {
@@ -284,6 +283,8 @@ ParseTree *CompareExpr(istream *in, int *line) {
 
 ParseTree *AddExpr(istream *in, int *line)
 {
+    //cout << "Do We Get To AddExpr?" << endl;
+
     //Part Done Already - DO NOT TOUCH
     ParseTree *t1 = MulExpr(in, line);
     if( t1 == 0 ) {
@@ -310,8 +311,10 @@ ParseTree *AddExpr(istream *in, int *line)
 
 ParseTree *MulExpr(istream *in, int *line)
 {
+    //cout << "Do we Get to Mult???" << endl;
+
     ParseTree *t1 = Factor(in, line);
-    ParseTree *t2 = Factor(in, line);
+
     if( t1 == 0 ) {
         ParseError(*line, "Error at MulExpr - 1");
         return 0;
@@ -323,7 +326,11 @@ ParseTree *MulExpr(istream *in, int *line)
         Parser::PushBackToken(t);
         return t1;
     }
-
+    ParseTree *t2 = Factor(in, line);
+    if(t2 == 0)
+    {
+        return 0;
+    }
     if( t == STAR )
     {
         return new TimesExpr(t.GetLinenum(), t1, t2);
@@ -342,6 +349,8 @@ ParseTree *MulExpr(istream *in, int *line)
 
 ParseTree *Factor(istream *in, int *line)
 {
+    // cout << "Do We Get To Factor??" << endl;
+
     //DO NOT TOUCH
     bool neg = false;
     Token t = Parser::GetNextToken(in, line);
@@ -374,28 +383,30 @@ ParseTree *Primary(istream *in, int *line)
      * Primary Grammar Rule:
      * Primary := IDENT | ICONST | SCONST | TRUE | FALSE | LPAREN Expr
      */
+    // cout << "Do we Get to Primary???" << endl;
+
     Token t = Parser::GetNextToken(in, line);
     if(t.GetTokenType() == IDENT)
     {
         return new Ident(t);
     }
-    if(t.GetTokenType() == ICONST)
+    else if(t.GetTokenType() == ICONST)
     {
         return new IConst(t);
     }
-    if(t.GetTokenType() == SCONST)
+    else if(t.GetTokenType() == SCONST)
     {
         return new SConst(t);
     }
-    if(t.GetTokenType() == TRUE)
+    else if(t.GetTokenType() == TRUE)
     {
         return new BoolConst(t, TRUE);
     }
-    if(t.GetTokenType() == FALSE)
+    else if(t.GetTokenType() == FALSE)
     {
         return new BoolConst(t, FALSE);
     }
-    if(t.GetTokenType() == LPAREN)
+    else if(t.GetTokenType() == LPAREN)
     {
         ParseTree *t1 = Expr(in, line);
         Token t = Parser::GetNextToken(in, line);
@@ -405,7 +416,8 @@ ParseTree *Primary(istream *in, int *line)
             ParseError(*line, "Error at Primary -  LPAREN - 1");
             Parser::PushBackToken(t);
             return 0;
-        } else if(t.GetTokenType() != RPAREN)
+        }
+        else if(t.GetTokenType() != RPAREN)
         {
             ParseError(*line, "Error at Primary -  LPAREN - 2");
             return 0;
