@@ -44,11 +44,6 @@ ParseError(int line, string msg)
 
 ParseTree *Prog(istream *in, int *line)
 {
-    /*
-     * Prog Grammar Rule:
-     * Prog := Slist
-     */
-    //Given so dont change it
     ParseTree *sl = Slist(in, line);
 
     if( sl == 0 )
@@ -63,22 +58,15 @@ ParseTree *Prog(istream *in, int *line)
 // Slist is a Statement followed by a Statement List
 ParseTree *Slist(istream *in, int *line)
 {
-    /*
-     * Slist Grammar Rule:
-     * Slist := Stmt SC { Slist }
-     */
-    //Given so dont change it
     ParseTree *s = Stmt(in, line);
-
     if( s == 0 )
         return 0;
 
-    //SC part - Semicolon
     if( Parser::GetNextToken(in, line) != SC ) {
         ParseError(*line, "Missing semicolon");
         return 0;
     }
-    //Statement List
+
     return new StmtList(s, Slist(in,line));
 }
 
