@@ -39,5 +39,5 @@ int main(int argc, char* argv[])
     }
     //DO NOT IMPLEMENT COUNTER IN MAIN - keep it here as professor said
     cout << "LEAF COUNT: " << prog->LeafCount() << endl;
-   // cout << "STRING COUNT: " << prog->StringCount() << endl;
+    cout << "STRING COUNT: " << prog->StringCount() << endl;
 }

@@ -11,7 +11,7 @@ using std::vector;
 using std::map;
 
 // NodeType represents all possible types
-enum NodeType { ERRTYPE, INTTYPE, STRTYPE, BOOLTYPE };
+enum NodeType { ERRTYPE, INTTYPE, STRTYPE, BOOLTYPE, IDENTTYPE };
 
 // a "forward declaration" for a class to hold values
 class Value;
@@ -42,8 +42,23 @@ public:
 			lc++;
 		return lc;
 	}
-    
-    // other methods
+    //Other Methods
+    int StringCount() const {
+        int sc = 0;
+        if( left ) sc += left->LeafCount();
+        if( right ) sc += right->LeafCount();
+        if( left == 0 && right == 0 )
+            sc++;
+        return sc;
+    }
+    int IdentCount() const {
+        int id = 0;
+        if( left ) id += left->IdentCount();
+        if( right ) id += right->IdentCount();
+        if((*this).GetType() == IDENTTYPE)
+            id++;
+        return id;
+    }
 };
 
 class StmtList : public ParseTree {

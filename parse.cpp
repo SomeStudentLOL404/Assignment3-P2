@@ -397,19 +397,20 @@ ParseTree *Primary(istream *in, int *line)
     }
     if(t.GetTokenType() == LPAREN)
     {
-        ParseTree *ex = Expr(in, line);
-        if(ex == 0)
+        ParseTree *t1 = Expr(in, line);
+        Token t = Parser::GetNextToken(in, line);
+
+        if(t1 == 0)
         {
             ParseError(*line, "Error at Primary -  LPAREN - 1");
+            Parser::PushBackToken(t);
             return 0;
-        }
-        t = Parser::GetNextToken(in, line);
-        if(t.GetTokenType() != RPAREN)
+        } else if(t.GetTokenType() != RPAREN)
         {
             ParseError(*line, "Error at Primary -  LPAREN - 2");
             return 0;
         }
-        return ex;
+        return t1;
     }
     return 0;
 }
