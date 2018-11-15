@@ -17,37 +17,37 @@ enum NodeType { ERRTYPE, INTTYPE, STRTYPE, BOOLTYPE, IDENTTYPE };
 class Value;
 
 class ParseTree {
-	int			linenum;
-	ParseTree	*left;
-	ParseTree	*right;
+    int			linenum;
+    ParseTree	*left;
+    ParseTree	*right;
 
 public:
-	ParseTree(int linenum, ParseTree *l = 0, ParseTree *r = 0)
-		: linenum(linenum), left(l), right(r) {}
+    ParseTree(int linenum, ParseTree *l = 0, ParseTree *r = 0)
+            : linenum(linenum), left(l), right(r) {}
 
-	virtual ~ParseTree() {
-		delete left;
-		delete right;
-	}
+    virtual ~ParseTree() {
+        delete left;
+        delete right;
+    }
 
-	int GetLinenum() const { return linenum; }
+    int GetLinenum() const { return linenum; }
 
-	virtual NodeType GetType() const { return ERRTYPE; }
+    virtual NodeType GetType() const { return ERRTYPE; }
 
-	int LeafCount() const {
-		int lc = 0;
-		if( left ) lc += left->LeafCount();
-		if( right ) lc += right->LeafCount();
-		if( left == 0 && right == 0 )
-			lc++;
-		return lc;
-	}
+    int LeafCount() const {
+        int lc = 0;
+        if( left ) lc += left->LeafCount();
+        if( right ) lc += right->LeafCount();
+        if( left == 0 && right == 0 )
+            lc++;
+        return lc;
+    }
     //Other Methods
     int StringCount() const {
         int sc = 0;
-        if( left ) sc += left->LeafCount();
-        if( right ) sc += right->LeafCount();
-        if( left == 0 && right == 0 )
+        if( left ) sc += left->StringCount();
+        if( right ) sc += right->StringCount();
+        if((*this).GetType() == STRTYPE)
             sc++;
         return sc;
     }
@@ -64,122 +64,123 @@ public:
 class StmtList : public ParseTree {
 
 public:
-	StmtList(ParseTree *l, ParseTree *r) : ParseTree(0, l, r) {}
+    StmtList(ParseTree *l, ParseTree *r) : ParseTree(0, l, r) {}
 
 };
 
 class IfStatement : public ParseTree {
 public:
-	IfStatement(int line, ParseTree *ex, ParseTree *stmt) : ParseTree(line, ex, stmt) {}
+    IfStatement(int line, ParseTree *ex, ParseTree *stmt) : ParseTree(line, ex, stmt) {}
 };
 
 class Assignment : public ParseTree {
 public:
-	Assignment(int line, ParseTree *lhs, ParseTree *rhs) : ParseTree(line, lhs, rhs) {}
+    Assignment(int line, ParseTree *lhs, ParseTree *rhs) : ParseTree(line, lhs, rhs) {}
 };
 
 class PrintStatement : public ParseTree {
 public:
-	PrintStatement(int line, ParseTree *e) : ParseTree(line, e) {}
+    PrintStatement(int line, ParseTree *e) : ParseTree(line, e) {}
 };
 
 class PlusExpr : public ParseTree {
 public:
-	PlusExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+    PlusExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
 };
 
 class MinusExpr : public ParseTree {
 public:
-	MinusExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+    MinusExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
 };
 
 class TimesExpr : public ParseTree {
 public:
-	TimesExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+    TimesExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
 };
 
 class DivideExpr : public ParseTree {
 public:
-	DivideExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+    DivideExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
 };
 
 class LogicAndExpr : public ParseTree {
 public:
-	LogicAndExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+    LogicAndExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
 };
 
 class LogicOrExpr : public ParseTree {
 public:
-	LogicOrExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+    LogicOrExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
 };
 
 class EqExpr : public ParseTree {
 public:
-	EqExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+    EqExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
 };
 
 class NEqExpr : public ParseTree {
 public:
-	NEqExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+    NEqExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
 };
 
 class LtExpr : public ParseTree {
 public:
-	LtExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+    LtExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
 };
 
 class LEqExpr : public ParseTree {
 public:
-	LEqExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+    LEqExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
 };
 
 class GtExpr : public ParseTree {
 public:
-	GtExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+    GtExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
 };
 
 class GEqExpr : public ParseTree {
 public:
-	GEqExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
+    GEqExpr(int line, ParseTree *l, ParseTree *r) : ParseTree(line,l,r) {}
 };
 
 class IConst : public ParseTree {
-	int val;
+    int val;
 
 public:
-	IConst(int l, int i) : ParseTree(l), val(i) {}
-	IConst(Token& t) : ParseTree(t.GetLinenum()) {
-		val = stoi(t.GetLexeme());
-	}
+    IConst(int l, int i) : ParseTree(l), val(i) {}
+    IConst(Token& t) : ParseTree(t.GetLinenum()) {
+        val = stoi(t.GetLexeme());
+    }
 
-	NodeType GetType() const { return INTTYPE; }
+    NodeType GetType() const { return INTTYPE; }
 };
 
 class BoolConst : public ParseTree {
-	bool val;
+    bool val;
 
 public:
-	BoolConst(Token& t, bool val) : ParseTree(t.GetLinenum()), val(val) {}
+    BoolConst(Token& t, bool val) : ParseTree(t.GetLinenum()), val(val) {}
 
-	NodeType GetType() const { return BOOLTYPE; }
+    NodeType GetType() const { return BOOLTYPE; }
 };
 
 class SConst : public ParseTree {
-	string val;
+    string val;
 
 public:
-	SConst(Token& t) : ParseTree(t.GetLinenum()) {
-		val = t.GetLexeme();
-	}
+    SConst(Token& t) : ParseTree(t.GetLinenum()) {
+        val = t.GetLexeme();
+    }
 
-	NodeType GetType() const { return STRTYPE; }
+    NodeType GetType() const { return STRTYPE; }
 };
 
 class Ident : public ParseTree {
-	string id;
+    string id;
 
 public:
-	Ident(Token& t) : ParseTree(t.GetLinenum()), id(t.GetLexeme()) {}
+    Ident(Token& t) : ParseTree(t.GetLinenum()), id(t.GetLexeme()) {}
+    NodeType GetType() const { return IDENTTYPE; }
 };
 
 #endif /* PARSETREE_H_ */

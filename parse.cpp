@@ -11,6 +11,11 @@
 #include <string.h>
 
 // WRAPPER FOR PUSHBACK
+
+map<string, int> mapv;
+
+
+// WRAPPER FOR PUSHBACK
 namespace Parser {
     bool pushed_back = false;
     Token	pushed_token;
@@ -388,6 +393,8 @@ ParseTree *Primary(istream *in, int *line)
     Token t = Parser::GetNextToken(in, line);
     if(t.GetTokenType() == IDENT)
     {
+
+        mapv[t.GetLexeme()]++;
         return new Ident(t);
     }
     else if(t.GetTokenType() == ICONST)
