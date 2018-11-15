@@ -1,9 +1,12 @@
 #include <iostream>
-#include <cstring>
 #include <fstream>
+#include <string.h>
+#include <vector>
 #include "tokens.h"
 #include "parse.h"
-#include "lex.h"
+#include "parsetree.h"
+#include "tokens.h"
+
 using namespace std;
 
 int main(int argc, char* argv[])
@@ -34,11 +37,6 @@ int main(int argc, char* argv[])
     {
         return 0; // quit on error
     }
-
     //DO NOT IMPLEMENT COUNTER IN MAIN - keep it here as professor said
-    /*
     cout << "LEAF COUNT: " << prog->LeafCount() << endl;
-    cout << "STRING COUNT: " << prog->StringCount() << endl;
-     */
-
 }
