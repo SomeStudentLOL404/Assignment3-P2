@@ -63,12 +63,17 @@ ParseTree *Prog(istream *in, int *line)
 // Slist is a Statement followed by a Statement List
 ParseTree *Slist(istream *in, int *line)
 {
+
     // cout << "Do we Get to SList???" << endl;
     ParseTree *s = Stmt(in, line);
     if( s == 0 )
         return 0;
 
-    if( Parser::GetNextToken(in, line) != SC ) {
+    Token a = Parser::GetNextToken(in, line);
+
+    if(a != SC ) {
+        Parser::PushBackToken(a);
+        //  cout << "Value of token is: " << a << " - at line nunber: " << *line << endl;
         ParseError(*line, "Missing semicolon");
         return 0;
     }
@@ -129,6 +134,7 @@ ParseTree *IfStmt(istream *in, int *line)
     }
     Token t = Parser::GetNextToken(in, line);
     if(t.GetTokenType() != THEN ) {
+        Parser::PushBackToken(t);
         ParseError(*line, "Error at IfStmt - 2");
         return 0;
     }
@@ -223,9 +229,6 @@ ParseTree *LogicExpr(istream *in, int *line)
 }
 
 ParseTree *CompareExpr(istream *in, int *line) {
-
-    //cout << "Do We Get To CompareExpr??" << endl;
-
     ParseTree *t1 = AddExpr(in, line);
     if( t1 == 0 )
     {
@@ -234,11 +237,16 @@ ParseTree *CompareExpr(istream *in, int *line) {
     }
 
     Token t = Parser::GetNextToken(in, line);
-    if(t.GetTokenType() != EQ && t.GetTokenType() != NEQ && t.GetTokenType() != GT && t.GetTokenType() != LT && t.GetTokenType() != LEQ)
+
+    //cout << "Value of T is: " << t << endl;
+
+    if(t.GetTokenType() != EQ && t.GetTokenType() != NEQ && t.GetTokenType() != GT && t.GetTokenType() != LT && t.GetTokenType() != LEQ && t.GetTokenType() != GEQ)
     {
+
         Parser::PushBackToken(t);
         return t1;
     }
+
     ParseTree *t2 = CompareExpr(in, line);
     if( t2 == 0 )
     {
@@ -246,12 +254,6 @@ ParseTree *CompareExpr(istream *in, int *line) {
         return 0;
     }
 
-    //if we have a token listed above, look for the second factor, and pass it into __Expr
-    //t2 would be the second factor
-    //the mult follows a similar pattern
-    //boop on discord
-
-    //Do Checks
     if( t == EQ )
     {
         return new EqExpr(t.GetLinenum(), t1, t2);
@@ -266,6 +268,7 @@ ParseTree *CompareExpr(istream *in, int *line) {
     }
     else if (t == GEQ)
     {
+        //cout << "At GEQ: " << t << endl;
         return new GEqExpr(t.GetLinenum(), t1, t2);
     }
     else if (t == LT)
@@ -274,6 +277,7 @@ ParseTree *CompareExpr(istream *in, int *line) {
     }
     else if (t == LEQ)
     {
+        // cout << "Value of t: " << t << endl;
         return new LEqExpr(t.GetLinenum(), t1, t2);
     }
     else
@@ -383,37 +387,31 @@ ParseTree *Factor(istream *in, int *line)
 
 ParseTree *Primary(istream *in, int *line)
 {
-    // PROCESS TOKEN, IDENTIFY PRIMARY, RETURN SOMETHING
-    /*
-     * Primary Grammar Rule:
-     * Primary := IDENT | ICONST | SCONST | TRUE | FALSE | LPAREN Expr
-     */
-    // cout << "Do we Get to Primary???" << endl;
-
     Token t = Parser::GetNextToken(in, line);
+    //cout << "T in Primary is: " << t << endl;
     if(t.GetTokenType() == IDENT)
     {
-
         mapv[t.GetLexeme()]++;
         return new Ident(t);
     }
-    else if(t.GetTokenType() == ICONST)
+    if(t.GetTokenType() == ICONST)
     {
+        //cout << "ICONST value is: " << t << endl;
         return new IConst(t);
     }
-    else if(t.GetTokenType() == SCONST)
+    if(t.GetTokenType() == SCONST)
     {
         return new SConst(t);
     }
-    else if(t.GetTokenType() == TRUE)
+    if(t.GetTokenType() == TRUE)
     {
         return new BoolConst(t, TRUE);
     }
-    else if(t.GetTokenType() == FALSE)
+    if(t.GetTokenType() == FALSE)
     {
         return new BoolConst(t, FALSE);
     }
-    else if(t.GetTokenType() == LPAREN)
+    if(t.GetTokenType() == LPAREN)
     {
         ParseTree *t1 = Expr(in, line);
         Token t = Parser::GetNextToken(in, line);
@@ -426,6 +424,7 @@ ParseTree *Primary(istream *in, int *line)
         }
         else if(t.GetTokenType() != RPAREN)
         {
+            Parser::PushBackToken(t);
             ParseError(*line, "Error at Primary -  LPAREN - 2");
             return 0;
         }
